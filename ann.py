@@ -41,7 +41,7 @@ df = pd.concat([df1, df2], axis=1)
 
 df = df[(np.abs(stats.zscore(df)) < 3).all(axis=1)]
 
-df_premod = df 
+df_premod = df.copy() 
 
 field_densities = df["field_density"].to_numpy()
 plasma_temps = df["plasma_temp"].to_numpy()
