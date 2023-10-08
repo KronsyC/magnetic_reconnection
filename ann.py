@@ -5,7 +5,16 @@ import matplotlib
 from scipy import stats
 import numpy as np
 
+from datetime import datetime, timedelta
 
+def day_to_date(day_number, year):
+    date_format = '%Y-%m-%d'
+    # create a datetime object for January 1st of the given year
+    start_date = datetime(year, 1, 1)
+    # add the number of days to the start date
+    result_date = start_date + timedelta(days=day_number-1)
+    # format the date string using the specified format
+    return result_date.strftime(date_format)
 RECONNECT_THRESHOLD = 75000
 MERGE_THRESHOLD = 0.01
 FIELD_DENSITY_WEIGHT = -1 
@@ -74,26 +83,46 @@ result_df = net_df.groupby('group').agg({
     # Add more columns as needed
 }).reset_index(drop=True)
 
-print(result_df)
+
+reconnect_dates = []
+
+for idx in result_df.index:
+    year = int(result_df["year"][idx])
+    day = int(result_df["day"][idx])
+    hour = int(result_df["hour"][idx])
+
+    date = day_to_date(day, year)
+    reconnect_dates.append(date)
+
+print("Magnetic Reconnection Is Expected to have happened in the following dates:")
+for d in reconnect_dates:
+    print("\t", d)
+
+
 t = df["time"]
 f1 = plt.figure()
 plt.bar(net_df["time"], net_df["value"], 0.01)
+plt.savefig("plots/suspected reconnects.png")
 # plt.plot(net_df["time"], net_df["value"])
 plt.title("Suspected Magnetic Reconnection Points")
 f2 = plt.figure()
 plt.title("Magnetic Field Densities over time")
 plt.plot(t, df_premod["field_density"])
+plt.savefig("plots/field density.png")
+
 
 plt.figure()
 plt.title("Plasma Temperatures over time")
 plt.plot(t, df_premod["plasma_temp"])
+plt.savefig("plots/plasma temps.png")
+
 
 plt.figure()
 plt.title("Proton Densities over time")
 plt.plot(t, df_premod["proton_density"])
-
+plt.savefig("plots/proton densities.png"
+            )
 plt.figure()
 plt.title("Ion Speeds over time")
 plt.plot(t, df_premod["speed"])
-plt.show()
-
+plt.savefig("plots/ion speeds.png")
